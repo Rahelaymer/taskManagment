@@ -1,28 +1,258 @@
+"use client";
 import Link from "next/link";
-import React from "react";
+import { useState } from "react";
+import { BiLogoGmail } from "react-icons/bi";
+import { IoMdEye, IoMdEyeOff, IoMdLock, IoMdPerson } from "react-icons/io";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useAuth } from "../context/authContext";
+import { useRouter } from "next/navigation";
 
-const signuppage = () => {
+const SignupPage = () => {
+  const { register, loading, error } = useAuth();
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const router = useRouter();
+
+  const validateInputs = () => {
+    const minLength = 8;
+    const containsLetter = /[a-zA-Z]/.test(password);
+    const containsNumber = /\d/.test(password);
+
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
+      toast.error("All fields are required.");
+      return false;
+    }
+    if (password.length < minLength) {
+      toast.error("Password must be at least 8 characters long.");
+      return false;
+    }
+    if (!containsLetter) {
+      toast.error("Password must contain at least one letter.");
+      return false;
+    }
+    if (!containsNumber) {
+      toast.error("Password must contain at least one number.");
+      return false;
+    }
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match.");
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!validateInputs()) return;
+    try {
+      await register(firstName, lastName, email, password);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleSignIn = () => {
+    router.push("/login");
+  };
+
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
+  const toggleConfirmPasswordVisibility = () =>
+    setShowConfirmPassword(!showConfirmPassword);
+
   return (
-    <div className="h-screen flex justify-center items-center">
-      <div className=" w-1/2 flex h-[70vh]   flex-col items-center justify-center">
-        <form className="flex flex-col">
-          <Link href="/login" className="mb-4 text-blue-700"></Link>
-          <label className="mb-4 ">User name</label>
-          <input className="mb-4 border" />
-          <label className="mb-4"> Password</label>
-          <input className="mb-4 border" />
-          <label className="mb-4"> Confrim Password</label>
-          <input className="mb-4 border" />
-          <Link href="/login">
-            <p className="text-blue-700 mb-16">Already have an account?</p>
-          </Link>
-          <button className="px-8 py-2  bg-blue-500 rounded-full text-white">
-            Signup
-          </button>
-        </form>
+    <div className="flex items-center justify-center h-full py-24 bg-gray-100">
+      <div className="p-6 sm:p-8 sm:pt-6 mt-4 w-full mx-2 sm:mx-0 max-w-md bg-white shadow-lg rounded-md">
+        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+          <h2 className="mt-4 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+            Sign Up for Free
+          </h2>
+        </div>
+        <div className="mt-9 sm:mx-auto">
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <div className="grid gap-6 mb-6 md:grid-cols-2">
+              <div>
+                <label
+                  htmlFor="firstName"
+                  className="block mb-2 text-sm font-medium text-gray-900"
+                >
+                  First Name
+                </label>
+                <div className="relative mt-2">
+                  <IoMdPerson
+                    className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-500"
+                    size={20}
+                  />
+                  <input
+                    id="firstName"
+                    name="firstName"
+                    type="text"
+                    placeholder="First Name"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    required
+                    className="pl-10 py-3 w-full rounded-md border border-gray-300 bg-gray-50 text-gray-900"
+                  />
+                </div>
+              </div>
+              <div>
+                <label
+                  htmlFor="lastName"
+                  className="block mb-2 text-sm font-medium text-gray-900"
+                >
+                  Last Name
+                </label>
+                <div className="relative mt-2">
+                  <IoMdPerson
+                    className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-500"
+                    size={20}
+                  />
+                  <input
+                    id="lastName"
+                    name="lastName"
+                    type="text"
+                    placeholder="Last Name"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    required
+                    className="pl-10 py-3 w-full rounded-md border border-gray-300 bg-gray-50 text-gray-900"
+                  />
+                </div>
+              </div>
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block mb-2 text-sm font-medium text-gray-900"
+                >
+                  Email
+                </label>
+                <div className="relative mt-2">
+                  <BiLogoGmail
+                    className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-500"
+                    size={20}
+                  />
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="pl-10 py-3 w-full rounded-md border border-gray-300 bg-gray-50 text-gray-900"
+                  />
+                </div>
+              </div>
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block mb-2 text-sm font-medium text-gray-900"
+                >
+                  Password
+                </label>
+                <div className="relative mt-2">
+                  <IoMdLock
+                    className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-500"
+                    size={20}
+                  />
+                  <div className="relative">
+                    <input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="pl-10 pr-12 py-3 w-full rounded-md border border-gray-300 bg-gray-50 text-gray-900"
+                    />
+                    {showPassword ? (
+                      <IoMdEyeOff
+                        className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+                        size={20}
+                        onClick={togglePasswordVisibility}
+                      />
+                    ) : (
+                      <IoMdEye
+                        className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+                        size={20}
+                        onClick={togglePasswordVisibility}
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label
+                  htmlFor="confirmPassword"
+                  className="block mb-2 text-sm font-medium text-gray-900"
+                >
+                  Confirm Password
+                </label>
+                <div className="relative mt-2">
+                  <IoMdLock
+                    className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-500"
+                    size={20}
+                  />
+                  <div className="relative">
+                    <input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="Confirm Password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                      className="pl-10 pr-12 py-3 w-full rounded-md border border-gray-300 bg-gray-50 text-gray-900"
+                    />
+                    {showConfirmPassword ? (
+                      <IoMdEyeOff
+                        className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+                        size={20}
+                        onClick={toggleConfirmPasswordVisibility}
+                      />
+                    ) : (
+                      <IoMdEye
+                        className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+                        size={20}
+                        onClick={toggleConfirmPasswordVisibility}
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full py-3 px-4 rounded-md font-medium text-sm shadow-sm ${
+                loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-600 text-white hover:bg-blue-700"
+              }`}
+            >
+              {loading ? "Signing Up..." : "Sign Up"}
+            </button>
+          </form>
+          <div className="mt-5 text-center text-sm text-gray-800">
+            Already have an account?
+            <button
+              onClick={handleSignIn}
+              className="font-semibold leading-6 text-blue-600 hover:underline"
+            >
+              Sign in
+            </button>
+          </div>
+        </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };
 
-export default signuppage;
+export default SignupPage;

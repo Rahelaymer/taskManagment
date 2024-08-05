@@ -1,5 +1,5 @@
 import React from "react";
-import Title from "../componenets/Title";
+import Title from "@/components/Title";
 import { LuFileEdit } from "react-icons/lu";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 const tableListpage = () => {
