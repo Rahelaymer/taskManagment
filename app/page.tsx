@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
-  // bg-gradient-to-b from-violet-300 to-violet-350-50 h-screen
   return (
     <main className="flex flex-col-reverse md:flex-row justify-center items-center h-screen">
       <div className="md:basis-1/2">

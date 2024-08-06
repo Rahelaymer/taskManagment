@@ -1,78 +1,85 @@
-import React from "react";
-import Title from "@/components/Title";
+"use client";
+import React, { useEffect, useState } from "react";
+import Card from "@/components/Card";
+import axios from "axios";
+import LoaderAnimation from "@/components/LoaderAnimation";
 
-const taskPage = () => {
+interface Task {
+  id: string;
+  title: string;
+  end_at: string;
+  time: string;
+  priority: string;
+  category: string;
+  description: string;
+  isComplete: boolean;
+}
+
+const Page: React.FC = () => {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [sessionData, setSessionData] = useState<string | null>(null);
+
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const token = window?.localStorage.getItem("token");
+      setSessionData(token);
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      if (!sessionData) return;
+      setLoading(true);
+      try {
+        const response = await axios.get(
+          "https://task-manager-back-r2x9.onrender.com/api/tasks",
+          {
+            headers: {
+              Accept: "application/json",
+              Authorization: `Bearer ${sessionData}`,
+            },
+          }
+        );
+        setTasks(response.data);
+        setError(null);
+      } catch (error) {
+        setError("Error fetching tasks. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTasks();
+  }, [sessionData]);
+
   return (
-    <div className="px-8">
-      <Title title="Task List" />
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
-        <div
-          className="
-      flex  gap-3  border-blue-500 border-2 px-2 py-4 rounded-2xl"
-        >
-          <div>
-            <h3 className="text-blue-500 font-bold">Assignment</h3>
-            <p>Finish the Task Managment Project.</p>
-            <p>7/7/2024</p>
+    <div className=" flex items-center justify-center">
+      <div>
+        {loading ? (
+          <td colSpan={6} className="text-center justify-center py-4">
+            <LoaderAnimation />
+          </td>
+        ) : error ? (
+          <div className="text-center py-4 text-red-600">{error}</div>
+        ) : (
+          <div className="grid w-full h-full gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {tasks.map((data, index) => (
+              <Card key={index} {...data} />
+            ))}
           </div>
-          <div className="basis-1/2 ">
-            <p>Priority: high</p>
-            <p>Status: inprogress</p>
-            <p>Category: work</p>
+        )}
+
+        {tasks.length == 0 && (
+          <div className=" bold text-4xl my-4 flex items-center justify-center ">
+            Empty Task
           </div>
-        </div>
-        <div
-          className="
-      flex gap-4  border-blue-500 border-2 px-2 py-4 rounded-2xl"
-        >
-          <div>
-            <h3 className="text-blue-500 font-bold">Read Book</h3>
-            <p>Read at least one chapter of the Next js.</p>
-            <p>7/7/2024</p>
-          </div>
-          <div className="basis-1/2 ">
-            <p>Priority: high</p>
-            <p>Status: inprogress</p>
-            <p>Category: work</p>
-          </div>
-        </div>
-        <div
-          className="
-      flex gap-4  border-blue-500 border-2 px-2 py-4 rounded-2xl"
-        >
-          <div>
-            <h3 className="text-blue-500 font-bold">Team Meeting</h3>
-            <p>
-              {" "}
-              Attend the weekly team meeting to discuss project updates and
-              milestones.
-            </p>
-            <p>7/7/2024</p>
-          </div>
-          <div className="basis-1/2 ">
-            <p>Priority: high</p>
-            <p>Status: inprogress</p>
-            <p>Category: work</p>
-          </div>
-        </div>
-        <div
-          className="
-      flex gap-4  border-blue-500 border-2 px-2 py-4 rounded-2xl"
-        >
-          <div>
-            <h3 className="text-blue-500 font-bold">Going to church</h3>
-            <p></p>
-            <p>7/7/2024</p>
-          </div>
-          <div className="basis-1/2 ">
-            <p>Priority: high</p>
-            <p>Status: inprogress</p>
-            <p>Category: Personal</p>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
 };
 
-export default taskPage;
+export default Page;

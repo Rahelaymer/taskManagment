@@ -7,6 +7,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "../context/authContext";
 import { useRouter } from "next/navigation";
+import { FaSpinner } from "react-icons/fa";
 
 const SignupPage = () => {
   const { register, loading, error } = useAuth();
@@ -18,6 +19,7 @@ const SignupPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const validateInputs = () => {
     const minLength = 8;
@@ -52,8 +54,12 @@ const SignupPage = () => {
     if (!validateInputs()) return;
     try {
       await register(firstName, lastName, email, password);
+      toast.success("Signup successful!");
+      setIsLoading(true);
+      router.push("/login");
     } catch (err) {
       console.error(err);
+      console.error("Signup error:", error);
     }
   };
 
@@ -74,7 +80,7 @@ const SignupPage = () => {
           </h2>
         </div>
         <div className="mt-9 sm:mx-auto">
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-6">
             <div className="grid gap-6 mb-6 md:grid-cols-2">
               <div>
                 <label
@@ -228,15 +234,16 @@ const SignupPage = () => {
               </div>
             </div>
             <button
+              onClick={handleSubmit}
               type="submit"
-              disabled={loading}
-              className={`w-full py-3 px-4 rounded-md font-medium text-sm shadow-sm ${
-                loading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 text-white hover:bg-blue-700"
-              }`}
+              className="flex w-full justify-center rounded-md bg-blue-500 px-3 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-600disabled:cursor-not-allowed"
+              disabled={isLoading}
             >
-              {loading ? "Signing Up..." : "Sign Up"}
+              {isLoading ? (
+                <FaSpinner className="animate-spin h-6 mr-2" />
+              ) : (
+                "Sign up"
+              )}
             </button>
           </form>
           <div className="mt-5 text-center text-sm text-gray-800">

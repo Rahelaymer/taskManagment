@@ -6,6 +6,7 @@ import { IoMdEye, IoMdEyeOff, IoMdLock } from "react-icons/io";
 import { useAuth } from "../context/authContext";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { FaSpinner } from "react-icons/fa";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -13,6 +14,8 @@ function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -22,11 +25,12 @@ function LoginPage() {
     router.push("/signup");
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSignIn = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
       await login(email, password);
       toast.success("Login successful!");
+      setIsLoading(true);
       router.push("/dashboard");
     } catch (error) {
       toast.error("Login failed. Please check your credentials.");
@@ -43,7 +47,7 @@ function LoginPage() {
           </h2>
         </div>
         <div className="mt-9 sm:mx-auto">
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-6">
             <div className="relative mt-2 w-full">
               <BiLogoGmail
                 className="absolute top-1/2 left-2 transform -translate-y-1/2 text-[#2063EB]"
@@ -92,14 +96,18 @@ function LoginPage() {
               )}
             </div>
 
-            <div className="relative mt-2 w-full">
-              <button
-                type="submit"
-                className="flex w-full justify-center rounded-md bg-blue-500 px-3 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-600"
-              >
-                Sign in
-              </button>
-            </div>
+            <button
+              onClick={handleSignIn}
+              type="submit"
+              className="flex w-full justify-center rounded-md bg-blue-500 px-3 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-600disabled:cursor-not-allowed"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <FaSpinner className="animate-spin h-6 mr-2" />
+              ) : (
+                "Sign in"
+              )}
+            </button>
           </form>
 
           <div className="mt-5 flex flex-col text-center text-sm text-gray-800 ">

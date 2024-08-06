@@ -59,7 +59,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       });
       const newToken = response.data.token;
       localStorage.setItem("token", newToken);
-      console.log(response);
       setToken(newToken);
     } catch (error) {
       console.error("Token refresh failed:", error);
@@ -74,9 +73,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         password,
       });
       const newToken = response.data.token;
+      const user = response.data.user
       const newRefreshToken = response.data.refreshToken;
       localStorage.setItem("token", newToken);
       localStorage.setItem("refreshToken", newRefreshToken);
+      localStorage.setItem("user", user);
+
       setToken(newToken);
       setRefreshToken(newRefreshToken);
     } catch (error) {

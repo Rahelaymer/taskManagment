@@ -27,11 +27,6 @@ const AddNewTask: React.FC = () => {
   const [error, setError] = useState("");
   const [token, setToken] = useState<string | null>(null);
 
-  // useEffect(() => {
-  //   // Retrieve token from local storage after component mounts
-  //   const storedToken = localStorage.getItem("token");
-  //   setToken(storedToken);
-  // }, [window]);
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -47,18 +42,11 @@ const AddNewTask: React.FC = () => {
     setIsError(false);
     setError("");
 
-    // if (!token) {
-    //   setError("User not authenticated.");
-    //   setIsError(true);
-    //   setIsLoading(false);
-    //   return;
-    // }
+
     const storedToken = window?.localStorage.getItem("token");
-    console.log('====================================');
-    console.log(storedToken);
-    console.log('====================================');
+
     try {
-      // API call to add a new task
+
       const response = await fetch(
         "https://task-manager-back-r2x9.onrender.com/api/tasks",
         {
@@ -77,7 +65,6 @@ const AddNewTask: React.FC = () => {
       }
 
       const addedTask = await response.json();
-      console.log("Task added:", addedTask);
       setIsSuccess(true);
       setFormState({
         title: "",
